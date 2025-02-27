@@ -580,6 +580,8 @@ check_daemon_running()
     local pid
     local cmd
 
+    test -n "${RBD_MIRROR_SKIP_DAEMON_CHECK}" && return;
+
     pid=$(cat "$(daemon_pid_file "${cluster}")" 2>/dev/null) || :
     if [ -z "${pid}" ] && [ -z "${restart}" ]
     then
