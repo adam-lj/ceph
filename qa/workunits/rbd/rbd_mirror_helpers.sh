@@ -580,6 +580,8 @@ check_daemon_running()
     local pid
     local cmd
 
+    test -n "${RBD_MIRROR_SKIP_DAEMON_CHECK}" && return;
+
     pid=$(cat "$(daemon_pid_file "${cluster}")" 2>/dev/null) || :
     if [ -z "${pid}" ] && [ -z "${restart}" ]
     then
@@ -1184,6 +1186,8 @@ test_mirror_pool_status_verbose()
     state=$(xmlstarlet sel -t -v \
         "//images/image[name='${image}']/state" <<< "$status")
 
+    # Allow for the state to be either up+foo or down+foo to account for the rbd-mirror daemon being terminated between checks
+    state=$(echo $state | sed 's/.*+//')
     echo "${state}" | grep "${state_pattern}" ||
     test "${last_update}" '>' "${prev_last_update}"
 }
