@@ -11,13 +11,14 @@ tasks:
     ops: 4000
     objects: 50
     ec_pool: true
-    erasure_code_use_overwrites: true
+    erasure_code_use_overwrites: false
     erasure_code_use_optimizations: true
     op_weights:
       read: 100
-      write: 100
+      append: 100
       delete: 50
       snap_create: 50
       snap_remove: 50
       rollback: 50
       copy_from: 50
+      write: 0
