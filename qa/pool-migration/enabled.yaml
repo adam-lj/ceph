@@ -1,0 +1,4 @@
+# Enable pool migration with 60s interval between migrations (ceph_test_rados default)
+overrides:
+  rados:
+    migrate_pool: true
