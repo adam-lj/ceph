@@ -1204,6 +1204,8 @@ protected:
   bool new_pool_migration_interval;
   /// set while migrating 1st object after activate
   bool new_pool_migration_interval_in_flight;
+  /// set when quiescing migrations before signaling unfound
+  bool quiescing_for_unfound = false;
 
   /// objects waiting for lock retry to delete source after successful copy_from
   std::set<hobject_t> pool_migration_source_delete_pending_lock;
