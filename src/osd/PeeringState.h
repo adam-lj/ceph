@@ -586,6 +586,12 @@ public:
   TrivialEvent(PoolMigrationStoppedUnfound)
   TrivialEvent(PoolMigrationStoppedTooFull)
   TrivialEvent(PoolMigrationStoppedRevoked)
+
+  struct PoolMigrationStoppedError : boost::statechart::event< PoolMigrationStoppedError > {
+    int error_code;
+    explicit PoolMigrationStoppedError(int err) : error_code(err) {}
+  };
+
   TrivialEvent(StopTargetPoolMigration)
 
   TrivialEvent(AllReplicasActivated)
@@ -1081,7 +1087,8 @@ public:
       boost::statechart::custom_reaction< DeferPoolMigration >,
       boost::statechart::custom_reaction< PoolMigrationStoppedUnfound >,
       boost::statechart::custom_reaction< PoolMigrationStoppedTooFull>,
-      boost::statechart::custom_reaction< PoolMigrationStoppedRevoked >
+      boost::statechart::custom_reaction< PoolMigrationStoppedRevoked >,
+      boost::statechart::custom_reaction< PoolMigrationStoppedError >
       > reactions;
     explicit MigratingSource(my_context ctx);
     void migration_release_reservations();
@@ -1091,6 +1098,7 @@ public:
     boost::statechart::result react(const PoolMigrationStoppedUnfound& evt);
     boost::statechart::result react(const PoolMigrationStoppedTooFull& evt);
     boost::statechart::result react(const PoolMigrationStoppedRevoked& evt);
+    boost::statechart::result react(const PoolMigrationStoppedError& evt);
     void exit();
   };
 
