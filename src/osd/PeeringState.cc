@@ -6085,6 +6085,24 @@ PeeringState::MigratingSource::react(const PoolMigrationStoppedRevoked &)
   ps->state_set(PG_STATE_MIGRATION_WAIT);
   suspend_migration();
   return transit<WaitLocalPoolMigrationReserved>();
+
+boost::statechart::result
+PeeringState::MigratingSource::react(const PoolMigrationStoppedError &evt)
+{
+  DECLARE_LOCALS;
+  psdout(1) << "migration stopped due to I/O error " << cpp_strerror(evt.error_code) << dendl;
+  ps->state_set(PG_STATE_MIGRATION_WAIT);
+  suspend_migration();
+
+  // Schedule retry after a delay for transient I/O errors
+  pl->schedule_event_after(
+    std::make_shared<PGPeeringEvent>(
+      ps->get_osdmap_epoch(),
+      ps->get_osdmap_epoch(),
+      DoPoolMigration()),
+    ps->cct->_conf->osd_pool_migration_retry_interval);
+  return transit<NotMigrating>();
+}
 }
 
 void PeeringState::MigratingSource::exit()
