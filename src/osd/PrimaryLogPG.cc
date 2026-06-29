@@ -15721,6 +15721,28 @@ bool PrimaryLogPG::handle_pool_migration_copy_failure(hobject_t oid, int r)
       }
       dout(20) << __func__ << " flushed pending delete for " << pending_oid << dendl;
     }
+
+    // Force-complete all in-flight migrations
+    // These may be stuck waiting for locks or callbacks that will never complete
+    // The migrations will be retried after quiesce completes and new reservation is granted
+    while (!pool_migrations_in_flight.empty()) {
+      hobject_t migration_oid = *pool_migrations_in_flight.begin();
+      pool_migrations_in_flight.erase(pool_migrations_in_flight.begin());
+
+      // Clean up recovering state - must call finish_recovery_op to balance accounting
+      auto i = recovering.find(migration_oid);
+      if (i != recovering.end()) {
+        recovering.erase(i);
+        finish_recovery_op(migration_oid);
+      }
+      dout(20) << __func__ << " force-completed in-flight migration for " << migration_oid << dendl;
+    }
+
+    // Immediately trigger quiesce completion since we've drained everything
+    ceph_assert(pool_migrations_in_flight.empty());
+    dout(10) << __func__ << " all migrations force-completed, triggering quiesce completion" << dendl;
+    handle_pool_migration_quiesce_complete();
+    return false;
   } else {
     // Already quiescing - this is expected as in-flight operations drain
     // Check if we need to upgrade from retry to fatal error
