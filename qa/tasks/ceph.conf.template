@@ -43,6 +43,8 @@
 	mon health detail to clog = false
 
 [osd]
+  debug osd = 20
+
         osd journal size = 100
 
         osd scrub load threshold = 5.0
