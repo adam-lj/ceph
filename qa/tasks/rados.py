@@ -298,7 +298,7 @@ def task(ctx, config):
         args.extend(['--max-attr-len', str(config.get('max_attr_len'))])
     if config.get('migrate_pool', False):
         args.extend(['--migrate-pool'])
-    if config.get('migration_enable_ec_optimizations', False):
+    if config.get('migration-enable_ec_optimizations', False):
         args.extend(['--migration-enable-ec-optimizations'])
     migration_interval = config.get('migration_interval')
     if migration_interval is not None:
