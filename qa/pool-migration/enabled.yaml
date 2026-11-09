@@ -4,7 +4,7 @@ overrides:
   ceph:
     conf:
       mon:
-        mon osd initial require min compat client: umbrella
+        mon osd initial require min compat client: vampire
       global:
         enable experimental unrecoverable data corrupting features: '*'
     log-ignorelist:
